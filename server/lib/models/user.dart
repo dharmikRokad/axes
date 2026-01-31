@@ -1,0 +1,19 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:mongo_dart/mongo_dart.dart';
+
+part 'user.freezed.dart';
+part 'user.g.dart';
+
+@freezed
+class User with _$User {
+  const factory User({
+    @JsonKey(name: '_id') required String id,
+    required String email,
+    required String passwordHash,
+    @Default('UTC') String timezone,
+    @Default({}) Map<String, dynamic> preferences,
+    required DateTime createdAt,
+  }) = _User;
+
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+}
