@@ -8,8 +8,11 @@ import '../lib/repositories/user_repository.dart';
 import '../lib/services/password_service.dart';
 import '../lib/services/token_service.dart';
 
+import '../lib/repositories/event_repository.dart';
+
 // Services
 final _userRepository = UserRepository();
+final _eventRepository = EventRepository();
 final _passwordService = PasswordService();
 final _tokenService = TokenService();
 
@@ -33,6 +36,7 @@ Handler middleware(Handler handler) {
         };
       })
       .use(provider<UserRepository>((_) => _userRepository))
+      .use(provider<EventRepository>((_) => _eventRepository))
       .use(provider<PasswordService>((_) => _passwordService))
       .use(provider<TokenService>((_) => _tokenService));
 }
