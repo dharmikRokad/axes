@@ -1,0 +1,88 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import '../../application/event/event_notifier.dart';
+
+class AgendaView extends ConsumerStatefulWidget {
+  const AgendaView({super.key});
+
+  @override
+  ConsumerState<AgendaView> createState() => _AgendaViewState();
+}
+
+class _AgendaViewState extends ConsumerState<AgendaView> {
+  @override
+  void initState() {
+    super.initState();
+    // Load events for next 30 days
+    final from = DateTime.now();
+    final to = from.add(const Duration(days: 30));
+    ref.read(eventListProvider.notifier).loadEvents(from: from, to: to);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final eventsAsync = ref.watch(eventListProvider);
+
+    return eventsAsync.when(
+      data: (events) {
+        if (events.isEmpty) {
+          return const Center(child: Text('No upcoming events'));
+        }
+
+        // Group events by date
+        final groupedEvents = <String, List<dynamic>>{};
+        for (final event in events) {
+          final dateKey = DateFormat('yyyy-MM-dd').format(event.startDateTime);
+          groupedEvents.putIfAbsent(dateKey, () => []).add(event);
+        }
+
+        final sortedKeys = groupedEvents.keys.toList()..sort();
+
+        return ListView.builder(
+          itemCount: sortedKeys.length,
+          itemBuilder: (context, index) {
+            final dateKey = sortedKeys[index];
+            final dayEvents = groupedEvents[dateKey]!;
+            final date = DateTime.parse(dateKey);
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    DateFormat('EEEE, MMMM d').format(date),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                ...dayEvents.map((event) {
+                  return ListTile(
+                    leading: Container(
+                      width: 4,
+                      height: 40,
+                      color: Colors.blue,
+                    ),
+                    title: Text(event.title),
+                    subtitle: Text(event.description),
+                    trailing: Text(
+                      DateFormat('h:mm a').format(event.startDateTime),
+                    ),
+                    onTap: () {
+                      // TODO: Show event details
+                    },
+                  );
+                }).toList(),
+                const Divider(),
+              ],
+            );
+          },
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (err, stack) => Center(child: Text('Error: $err')),
+    );
+  }
+}

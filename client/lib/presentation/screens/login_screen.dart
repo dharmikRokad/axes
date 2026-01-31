@@ -18,12 +18,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     ref.listen<AuthState>(authNotifierProvider, (previous, next) {
-      if (next is! _Loading && next is! _Failure) {
-        // Handle success navigation
-        // next.maybeMap(authenticated: (_) => context.go('/'), orElse: () {});
-        // For simplicity, we assume we check authenticated state
-      }
-
       next.maybeMap(
         authenticated: (_) => context.go('/'),
         failure: (f) => ScaffoldMessenger.of(
@@ -44,7 +38,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.Center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextField(
               controller: _emailController,

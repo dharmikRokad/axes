@@ -1,0 +1,100 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:table_calendar/table_calendar.dart';
+import '../../application/event/event_notifier.dart';
+import '../../domain/entities/event.dart';
+
+class MonthView extends ConsumerStatefulWidget {
+  const MonthView({super.key});
+
+  @override
+  ConsumerState<MonthView> createState() => _MonthViewState();
+}
+
+class _MonthViewState extends ConsumerState<MonthView> {
+  DateTime _focusedDay = DateTime.now();
+  DateTime? _selectedDay;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadEventsForMonth();
+  }
+
+  void _loadEventsForMonth() {
+    final firstDay = DateTime(_focusedDay.year, _focusedDay.month, 1);
+    final lastDay = DateTime(_focusedDay.year, _focusedDay.month + 1, 0);
+    ref
+        .read(eventListProvider.notifier)
+        .loadEvents(from: firstDay, to: lastDay);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final eventsAsync = ref.watch(eventListProvider);
+
+    return Column(
+      children: [
+        TableCalendar(
+          firstDay: DateTime.utc(2020, 1, 1),
+          lastDay: DateTime.utc(2030, 12, 31),
+          focusedDay: _focusedDay,
+          selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+          onDaySelected: (selectedDay, focusedDay) {
+            setState(() {
+              _selectedDay = selectedDay;
+              _focusedDay = focusedDay;
+            });
+          },
+          onPageChanged: (focusedDay) {
+            _focusedDay = focusedDay;
+            _loadEventsForMonth();
+          },
+          eventLoader: (day) {
+            return eventsAsync.value
+                    ?.where((e) => isSameDay(e.startDateTime, day))
+                    .toList() ??
+                [];
+          },
+        ),
+        const SizedBox(height: 16),
+        Expanded(
+          child: eventsAsync.when(
+            data: (events) {
+              final selectedEvents = _selectedDay != null
+                  ? events
+                        .where((e) => isSameDay(e.startDateTime, _selectedDay!))
+                        .toList()
+                  : <Event>[];
+
+              if (selectedEvents.isEmpty) {
+                return const Center(child: Text('No events for selected day'));
+              }
+
+              return ListView.builder(
+                itemCount: selectedEvents.length,
+                itemBuilder: (context, index) {
+                  final event = selectedEvents[index];
+                  return ListTile(
+                    title: Text(event.title),
+                    subtitle: Text(
+                      '${event.startDateTime.hour}:${event.startDateTime.minute.toString().padLeft(2, '0')}',
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: () => ref
+                          .read(eventListProvider.notifier)
+                          .deleteEvent(event.id),
+                    ),
+                  );
+                },
+              );
+            },
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (err, stack) => Center(child: Text('Error: $err')),
+          ),
+        ),
+      ],
+    );
+  }
+}
