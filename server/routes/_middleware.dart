@@ -1,14 +1,12 @@
+import 'package:axes_server/data_sources/mongo_data_source.dart';
+import 'package:axes_server/repositories/event_repository.dart';
+import 'package:axes_server/repositories/user_repository.dart';
+import 'package:axes_server/services/password_service.dart';
+import 'package:axes_server/services/token_service.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dotenv/dotenv.dart';
-import 'package:mongo_dart/mongo_dart.dart';
 import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 
-import '../lib/data_sources/mongo_data_source.dart';
-import '../lib/repositories/user_repository.dart';
-import '../lib/services/password_service.dart';
-import '../lib/services/token_service.dart';
-
-import '../lib/repositories/event_repository.dart';
 
 // Services
 final _userRepository = UserRepository();

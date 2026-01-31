@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:axes_server/repositories/user_repository.dart';
+import 'package:axes_server/services/password_service.dart';
+import 'package:axes_server/services/token_service.dart';
 import 'package:dart_frog/dart_frog.dart';
-import '../../lib/repositories/user_repository.dart';
-import '../../lib/services/password_service.dart';
-import '../../lib/services/token_service.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.post) {

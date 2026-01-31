@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:axes_server/models/event.dart';
+import 'package:axes_server/repositories/event_repository.dart';
 import 'package:dart_frog/dart_frog.dart';
-import 'package:server/repositories/event_repository.dart';
-import 'package:server/models/event.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   // TODO: Verify auth token and extract userId

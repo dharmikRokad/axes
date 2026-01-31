@@ -1,4 +1,4 @@
-name: server
+name: axes_server
 description: A new Dart Frog application
 version: 1.0.0+1
 publish_to: none

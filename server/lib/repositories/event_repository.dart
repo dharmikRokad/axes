@@ -1,7 +1,7 @@
+import 'package:axes_server/data_sources/mongo_data_source.dart';
+import 'package:axes_server/models/event.dart';
+import 'package:axes_server/services/recurrence_service.dart';
 import 'package:mongo_dart/mongo_dart.dart';
-import '../data_sources/mongo_data_source.dart';
-import '../models/event.dart';
-import '../services/recurrence_service.dart';
 
 class EventRepository {
   DbCollection get _events => MongoDataSource.db.collection('events');
