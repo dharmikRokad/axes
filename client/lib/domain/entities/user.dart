@@ -6,10 +6,11 @@ part 'user.g.dart';
 @freezed
 abstract class User with _$User {
   const factory User({
-    required String id,
+    @JsonKey(name: '_id') required String id,
     required String email,
     @Default('UTC') String timezone,
     @Default({}) Map<String, dynamic> preferences,
+    DateTime? createdAt,
   }) = _User;
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);

@@ -35,10 +35,14 @@ Future<Response> _getCalendars(RequestContext context) async {
   final db = MongoDataSource.db;
   // TODO: Filter by ownerId from JWT
   final calendars = await db.collection('calendars').find().toList();
-  // Transform ObjectId to String
+  // Transform ObjectId to String and DateTime to ISO string
   final result = calendars.map((c) {
     c['id'] = (c['_id'] as ObjectId).toHexString();
     c.remove('_id');
+    // Convert DateTime to ISO string
+    if (c['createdAt'] is DateTime) {
+      c['createdAt'] = (c['createdAt'] as DateTime).toIso8601String();
+    }
     return c;
   }).toList();
 
@@ -51,18 +55,23 @@ Future<Response> _createCalendar(RequestContext context) async {
 
   final db = MongoDataSource.db;
   final id = ObjectId();
+  final now = DateTime.now();
   final calendar = {
     '_id': id,
-    'name': body['name'],
-    'color': body['color'],
+    'name': body['name'] as String,
+    'color': body['color'] as String,
     'ownerId': 'TODO_USER_ID', // Extract from token
-    'createdAt': DateTime.now(),
+    'createdAt': now,
   };
 
   await db.collection('calendars').insert(calendar);
 
-  calendar['id'] = id.toHexString();
-  calendar.remove('_id');
-
-  return Response.json(body: calendar);
+  // Return JSON-serializable response
+  return Response.json(body: {
+    'id': id.toHexString(),
+    'name': body['name'],
+    'color': body['color'],
+    'ownerId': 'TODO_USER_ID',
+    'createdAt': now.toIso8601String(),
+  });
 }

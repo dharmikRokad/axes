@@ -21,15 +21,22 @@ bool _envLoaded = false;
 Handler middleware(Handler handler) {
   return handler
       .use(requestLogger())
-      .use(fromShelfMiddleware(corsHeaders()))
+      .use(fromShelfMiddleware(corsHeaders(
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods':
+              'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers':
+              'Origin, Content-Type, Authorization, Accept',
+          'Access-Control-Allow-Credentials': 'true',
+        },
+      )))
       .use((handler) {
         return (context) async {
           if (!_envLoaded) {
             var env = DotEnv(includePlatformEnvironment: true)..load();
-            // We might need to manually put Env into Platform.environment if not handled strictly
-            // But MongoDataSource uses Platform.environment
             _envLoaded = true;
-            await MongoDataSource.init();
+            await MongoDataSource.init(env: env);
           }
           final response = await handler(context);
           return response;

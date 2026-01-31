@@ -7,7 +7,7 @@ import '../../domain/repositories/auth_repository.dart';
 class AuthRepositoryImpl implements AuthRepository {
   final Dio _dio;
   final FlutterSecureStorage _storage;
-
+    
   AuthRepositoryImpl(this._dio, this._storage);
 
   @override
@@ -25,11 +25,13 @@ class AuthRepositoryImpl implements AuthRepository {
 
       return right(user);
     } on DioException catch (e) {
+      print('erorr $e');
       if (e.response?.data != null && e.response!.data['error'] != null) {
         return left(e.response!.data['error']);
       }
       return left('Login failed');
-    } catch (e) {
+    } catch (e, s) {
+      print('erorr $e $s');
       return left(e.toString());
     }
   }

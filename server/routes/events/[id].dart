@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
-import '../../../lib/repositories/event_repository.dart';
+import 'package:server/repositories/event_repository.dart';
 
 Future<Response> onRequest(RequestContext context, String id) async {
   final eventRepo = context.read<EventRepository>();

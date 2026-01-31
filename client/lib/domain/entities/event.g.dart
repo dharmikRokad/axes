@@ -7,7 +7,7 @@ part of 'event.dart';
 // **************************************************************************
 
 _Event _$EventFromJson(Map<String, dynamic> json) => _Event(
-  id: json['id'] as String,
+  id: json['_id'] as String,
   calendarId: json['calendarId'] as String,
   baseEventId: json['baseEventId'] as String?,
   title: json['title'] as String,
@@ -27,10 +27,19 @@ _Event _$EventFromJson(Map<String, dynamic> json) => _Event(
           ?.map((e) => e as Map<String, dynamic>)
           .toList() ??
       const [],
+  createdAt: json['createdAt'] == null
+      ? null
+      : DateTime.parse(json['createdAt'] as String),
+  updatedAt: json['updatedAt'] == null
+      ? null
+      : DateTime.parse(json['updatedAt'] as String),
+  deletedAt: json['deletedAt'] == null
+      ? null
+      : DateTime.parse(json['deletedAt'] as String),
 );
 
 Map<String, dynamic> _$EventToJson(_Event instance) => <String, dynamic>{
-  'id': instance.id,
+  '_id': instance.id,
   'calendarId': instance.calendarId,
   'baseEventId': instance.baseEventId,
   'title': instance.title,
@@ -45,4 +54,7 @@ Map<String, dynamic> _$EventToJson(_Event instance) => <String, dynamic>{
   'recurrenceExceptionDate': instance.recurrenceExceptionDate
       ?.toIso8601String(),
   'reminders': instance.reminders,
+  'createdAt': instance.createdAt?.toIso8601String(),
+  'updatedAt': instance.updatedAt?.toIso8601String(),
+  'deletedAt': instance.deletedAt?.toIso8601String(),
 };

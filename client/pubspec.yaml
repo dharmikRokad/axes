@@ -47,6 +47,7 @@ dependencies:
   table_calendar: ^3.2.0
   riverpod_annotation: ^4.0.1
   json_annotation: 4.9.0
+  pretty_dio_logger: ^1.4.0
 
 dev_dependencies:
   flutter_test:

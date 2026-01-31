@@ -6,7 +6,7 @@ part 'recurrence_rule.g.dart';
 enum Frequency { daily, weekly, monthly, yearly }
 
 @freezed
-class RecurrenceRule with _$RecurrenceRule {
+abstract class RecurrenceRule with _$RecurrenceRule {
   const factory RecurrenceRule({
     required Frequency frequency,
     @Default(1) int interval,
@@ -21,7 +21,7 @@ class RecurrenceRule with _$RecurrenceRule {
       _$RecurrenceRuleFromJson(json);
 
   // Parse simplified RRULE string
-  factory RecurrenceRule.fromRRULE(String rrule) {
+  static RecurrenceRule fromRRULE(String rrule) {
     final parts = rrule.split(';');
     Frequency? freq;
     int interval = 1;
@@ -102,7 +102,10 @@ class RecurrenceRule with _$RecurrenceRule {
       byMonth: byMonth,
     );
   }
+}
 
+
+extension ToRRULE on RecurrenceRule {
   // Convert to RRULE string
   String toRRULE() {
     final parts = <String>[];

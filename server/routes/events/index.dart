@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
-import '../../lib/repositories/event_repository.dart';
-import '../../lib/models/event.dart';
+import 'package:server/repositories/event_repository.dart';
+import 'package:server/models/event.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   // TODO: Verify auth token and extract userId
@@ -60,14 +60,14 @@ Future<Response> _createEvent(RequestContext context) async {
   final now = DateTime.now();
   final event = Event(
     id: '', // Will be set by repository
-    calendarId: body['calendarId'],
-    title: body['title'],
-    description: body['description'] ?? '',
-    location: body['location'] ?? '',
-    startDateTime: DateTime.parse(body['startDateTime']),
-    endDateTime: DateTime.parse(body['endDateTime']),
-    allDay: body['allDay'] ?? false,
-    timezone: body['timezone'] ?? 'UTC',
+    calendarId: body['calendarId'] as String,
+    title: body['title'] as String,
+    description: (body['description'] as String?) ?? '',
+    location: (body['location'] as String?) ?? '',
+    startDateTime: DateTime.parse(body['startDateTime'] as String),
+    endDateTime: DateTime.parse(body['endDateTime'] as String),
+    allDay: (body['allDay'] as bool?) ?? false,
+    timezone: (body['timezone'] as String?) ?? 'UTC',
     createdAt: now,
     updatedAt: now,
   );

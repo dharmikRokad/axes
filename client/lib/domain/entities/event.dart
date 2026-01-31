@@ -6,7 +6,7 @@ part 'event.g.dart';
 @freezed
 abstract class Event with _$Event {
   const factory Event({
-    required String id,
+    @JsonKey(name: '_id') required String id,
     required String calendarId,
     String? baseEventId,
     required String title,
@@ -20,6 +20,9 @@ abstract class Event with _$Event {
     @Default(false) bool isException,
     DateTime? recurrenceExceptionDate,
     @Default([]) List<Map<String, dynamic>> reminders,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    DateTime? deletedAt,
   }) = _Event;
 
   factory Event.fromJson(Map<String, dynamic> json) => _$EventFromJson(json);

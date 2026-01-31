@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$User {
 
- String get id; String get email; String get timezone; Map<String, dynamic> get preferences;
+@JsonKey(name: '_id') String get id; String get email; String get timezone; Map<String, dynamic> get preferences; DateTime? get createdAt;
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $UserCopyWith<User> get copyWith => _$UserCopyWithImpl<User>(this as User, _$ide
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is User&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.timezone, timezone) || other.timezone == timezone)&&const DeepCollectionEquality().equals(other.preferences, preferences));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is User&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.timezone, timezone) || other.timezone == timezone)&&const DeepCollectionEquality().equals(other.preferences, preferences)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,email,timezone,const DeepCollectionEquality().hash(preferences));
+int get hashCode => Object.hash(runtimeType,id,email,timezone,const DeepCollectionEquality().hash(preferences),createdAt);
 
 @override
 String toString() {
-  return 'User(id: $id, email: $email, timezone: $timezone, preferences: $preferences)';
+  return 'User(id: $id, email: $email, timezone: $timezone, preferences: $preferences, createdAt: $createdAt)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $UserCopyWith<$Res>  {
   factory $UserCopyWith(User value, $Res Function(User) _then) = _$UserCopyWithImpl;
 @useResult
 $Res call({
- String id, String email, String timezone, Map<String, dynamic> preferences
+@JsonKey(name: '_id') String id, String email, String timezone, Map<String, dynamic> preferences, DateTime? createdAt
 });
 
 
@@ -65,13 +65,14 @@ class _$UserCopyWithImpl<$Res>
 
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? email = null,Object? timezone = null,Object? preferences = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? email = null,Object? timezone = null,Object? preferences = null,Object? createdAt = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,timezone: null == timezone ? _self.timezone : timezone // ignore: cast_nullable_to_non_nullable
 as String,preferences: null == preferences ? _self.preferences : preferences // ignore: cast_nullable_to_non_nullable
-as Map<String, dynamic>,
+as Map<String, dynamic>,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 
@@ -156,10 +157,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String email,  String timezone,  Map<String, dynamic> preferences)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String email,  String timezone,  Map<String, dynamic> preferences,  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _User() when $default != null:
-return $default(_that.id,_that.email,_that.timezone,_that.preferences);case _:
+return $default(_that.id,_that.email,_that.timezone,_that.preferences,_that.createdAt);case _:
   return orElse();
 
 }
@@ -177,10 +178,10 @@ return $default(_that.id,_that.email,_that.timezone,_that.preferences);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String email,  String timezone,  Map<String, dynamic> preferences)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String email,  String timezone,  Map<String, dynamic> preferences,  DateTime? createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _User():
-return $default(_that.id,_that.email,_that.timezone,_that.preferences);case _:
+return $default(_that.id,_that.email,_that.timezone,_that.preferences,_that.createdAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -197,10 +198,10 @@ return $default(_that.id,_that.email,_that.timezone,_that.preferences);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String email,  String timezone,  Map<String, dynamic> preferences)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: '_id')  String id,  String email,  String timezone,  Map<String, dynamic> preferences,  DateTime? createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _User() when $default != null:
-return $default(_that.id,_that.email,_that.timezone,_that.preferences);case _:
+return $default(_that.id,_that.email,_that.timezone,_that.preferences,_that.createdAt);case _:
   return null;
 
 }
@@ -212,10 +213,10 @@ return $default(_that.id,_that.email,_that.timezone,_that.preferences);case _:
 @JsonSerializable()
 
 class _User implements User {
-  const _User({required this.id, required this.email, this.timezone = 'UTC', final  Map<String, dynamic> preferences = const {}}): _preferences = preferences;
+  const _User({@JsonKey(name: '_id') required this.id, required this.email, this.timezone = 'UTC', final  Map<String, dynamic> preferences = const {}, this.createdAt}): _preferences = preferences;
   factory _User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
-@override final  String id;
+@override@JsonKey(name: '_id') final  String id;
 @override final  String email;
 @override@JsonKey() final  String timezone;
  final  Map<String, dynamic> _preferences;
@@ -225,6 +226,7 @@ class _User implements User {
   return EqualUnmodifiableMapView(_preferences);
 }
 
+@override final  DateTime? createdAt;
 
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
@@ -239,16 +241,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _User&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.timezone, timezone) || other.timezone == timezone)&&const DeepCollectionEquality().equals(other._preferences, _preferences));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _User&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.timezone, timezone) || other.timezone == timezone)&&const DeepCollectionEquality().equals(other._preferences, _preferences)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,email,timezone,const DeepCollectionEquality().hash(_preferences));
+int get hashCode => Object.hash(runtimeType,id,email,timezone,const DeepCollectionEquality().hash(_preferences),createdAt);
 
 @override
 String toString() {
-  return 'User(id: $id, email: $email, timezone: $timezone, preferences: $preferences)';
+  return 'User(id: $id, email: $email, timezone: $timezone, preferences: $preferences, createdAt: $createdAt)';
 }
 
 
@@ -259,7 +261,7 @@ abstract mixin class _$UserCopyWith<$Res> implements $UserCopyWith<$Res> {
   factory _$UserCopyWith(_User value, $Res Function(_User) _then) = __$UserCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String email, String timezone, Map<String, dynamic> preferences
+@JsonKey(name: '_id') String id, String email, String timezone, Map<String, dynamic> preferences, DateTime? createdAt
 });
 
 
@@ -276,13 +278,14 @@ class __$UserCopyWithImpl<$Res>
 
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? email = null,Object? timezone = null,Object? preferences = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? email = null,Object? timezone = null,Object? preferences = null,Object? createdAt = freezed,}) {
   return _then(_User(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,timezone: null == timezone ? _self.timezone : timezone // ignore: cast_nullable_to_non_nullable
 as String,preferences: null == preferences ? _self._preferences : preferences // ignore: cast_nullable_to_non_nullable
-as Map<String, dynamic>,
+as Map<String, dynamic>,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 

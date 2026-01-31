@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Event {
 
- String get id; String get calendarId; String? get baseEventId; String get title; String get description; String get location; DateTime get startDateTime; DateTime get endDateTime; bool get allDay; String get timezone; String? get recurrenceRule; bool get isException; DateTime? get recurrenceExceptionDate; List<Map<String, dynamic>> get reminders;
+@JsonKey(name: '_id') String get id; String get calendarId; String? get baseEventId; String get title; String get description; String get location; DateTime get startDateTime; DateTime get endDateTime; bool get allDay; String get timezone; String? get recurrenceRule; bool get isException; DateTime? get recurrenceExceptionDate; List<Map<String, dynamic>> get reminders; DateTime? get createdAt; DateTime? get updatedAt; DateTime? get deletedAt;
 /// Create a copy of Event
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $EventCopyWith<Event> get copyWith => _$EventCopyWithImpl<Event>(this as Event, 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Event&&(identical(other.id, id) || other.id == id)&&(identical(other.calendarId, calendarId) || other.calendarId == calendarId)&&(identical(other.baseEventId, baseEventId) || other.baseEventId == baseEventId)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.location, location) || other.location == location)&&(identical(other.startDateTime, startDateTime) || other.startDateTime == startDateTime)&&(identical(other.endDateTime, endDateTime) || other.endDateTime == endDateTime)&&(identical(other.allDay, allDay) || other.allDay == allDay)&&(identical(other.timezone, timezone) || other.timezone == timezone)&&(identical(other.recurrenceRule, recurrenceRule) || other.recurrenceRule == recurrenceRule)&&(identical(other.isException, isException) || other.isException == isException)&&(identical(other.recurrenceExceptionDate, recurrenceExceptionDate) || other.recurrenceExceptionDate == recurrenceExceptionDate)&&const DeepCollectionEquality().equals(other.reminders, reminders));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Event&&(identical(other.id, id) || other.id == id)&&(identical(other.calendarId, calendarId) || other.calendarId == calendarId)&&(identical(other.baseEventId, baseEventId) || other.baseEventId == baseEventId)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.location, location) || other.location == location)&&(identical(other.startDateTime, startDateTime) || other.startDateTime == startDateTime)&&(identical(other.endDateTime, endDateTime) || other.endDateTime == endDateTime)&&(identical(other.allDay, allDay) || other.allDay == allDay)&&(identical(other.timezone, timezone) || other.timezone == timezone)&&(identical(other.recurrenceRule, recurrenceRule) || other.recurrenceRule == recurrenceRule)&&(identical(other.isException, isException) || other.isException == isException)&&(identical(other.recurrenceExceptionDate, recurrenceExceptionDate) || other.recurrenceExceptionDate == recurrenceExceptionDate)&&const DeepCollectionEquality().equals(other.reminders, reminders)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.deletedAt, deletedAt) || other.deletedAt == deletedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,calendarId,baseEventId,title,description,location,startDateTime,endDateTime,allDay,timezone,recurrenceRule,isException,recurrenceExceptionDate,const DeepCollectionEquality().hash(reminders));
+int get hashCode => Object.hash(runtimeType,id,calendarId,baseEventId,title,description,location,startDateTime,endDateTime,allDay,timezone,recurrenceRule,isException,recurrenceExceptionDate,const DeepCollectionEquality().hash(reminders),createdAt,updatedAt,deletedAt);
 
 @override
 String toString() {
-  return 'Event(id: $id, calendarId: $calendarId, baseEventId: $baseEventId, title: $title, description: $description, location: $location, startDateTime: $startDateTime, endDateTime: $endDateTime, allDay: $allDay, timezone: $timezone, recurrenceRule: $recurrenceRule, isException: $isException, recurrenceExceptionDate: $recurrenceExceptionDate, reminders: $reminders)';
+  return 'Event(id: $id, calendarId: $calendarId, baseEventId: $baseEventId, title: $title, description: $description, location: $location, startDateTime: $startDateTime, endDateTime: $endDateTime, allDay: $allDay, timezone: $timezone, recurrenceRule: $recurrenceRule, isException: $isException, recurrenceExceptionDate: $recurrenceExceptionDate, reminders: $reminders, createdAt: $createdAt, updatedAt: $updatedAt, deletedAt: $deletedAt)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $EventCopyWith<$Res>  {
   factory $EventCopyWith(Event value, $Res Function(Event) _then) = _$EventCopyWithImpl;
 @useResult
 $Res call({
- String id, String calendarId, String? baseEventId, String title, String description, String location, DateTime startDateTime, DateTime endDateTime, bool allDay, String timezone, String? recurrenceRule, bool isException, DateTime? recurrenceExceptionDate, List<Map<String, dynamic>> reminders
+@JsonKey(name: '_id') String id, String calendarId, String? baseEventId, String title, String description, String location, DateTime startDateTime, DateTime endDateTime, bool allDay, String timezone, String? recurrenceRule, bool isException, DateTime? recurrenceExceptionDate, List<Map<String, dynamic>> reminders, DateTime? createdAt, DateTime? updatedAt, DateTime? deletedAt
 });
 
 
@@ -65,7 +65,7 @@ class _$EventCopyWithImpl<$Res>
 
 /// Create a copy of Event
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? calendarId = null,Object? baseEventId = freezed,Object? title = null,Object? description = null,Object? location = null,Object? startDateTime = null,Object? endDateTime = null,Object? allDay = null,Object? timezone = null,Object? recurrenceRule = freezed,Object? isException = null,Object? recurrenceExceptionDate = freezed,Object? reminders = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? calendarId = null,Object? baseEventId = freezed,Object? title = null,Object? description = null,Object? location = null,Object? startDateTime = null,Object? endDateTime = null,Object? allDay = null,Object? timezone = null,Object? recurrenceRule = freezed,Object? isException = null,Object? recurrenceExceptionDate = freezed,Object? reminders = null,Object? createdAt = freezed,Object? updatedAt = freezed,Object? deletedAt = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,calendarId: null == calendarId ? _self.calendarId : calendarId // ignore: cast_nullable_to_non_nullable
@@ -81,7 +81,10 @@ as String,recurrenceRule: freezed == recurrenceRule ? _self.recurrenceRule : rec
 as String?,isException: null == isException ? _self.isException : isException // ignore: cast_nullable_to_non_nullable
 as bool,recurrenceExceptionDate: freezed == recurrenceExceptionDate ? _self.recurrenceExceptionDate : recurrenceExceptionDate // ignore: cast_nullable_to_non_nullable
 as DateTime?,reminders: null == reminders ? _self.reminders : reminders // ignore: cast_nullable_to_non_nullable
-as List<Map<String, dynamic>>,
+as List<Map<String, dynamic>>,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,deletedAt: freezed == deletedAt ? _self.deletedAt : deletedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 
@@ -166,10 +169,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String calendarId,  String? baseEventId,  String title,  String description,  String location,  DateTime startDateTime,  DateTime endDateTime,  bool allDay,  String timezone,  String? recurrenceRule,  bool isException,  DateTime? recurrenceExceptionDate,  List<Map<String, dynamic>> reminders)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String calendarId,  String? baseEventId,  String title,  String description,  String location,  DateTime startDateTime,  DateTime endDateTime,  bool allDay,  String timezone,  String? recurrenceRule,  bool isException,  DateTime? recurrenceExceptionDate,  List<Map<String, dynamic>> reminders,  DateTime? createdAt,  DateTime? updatedAt,  DateTime? deletedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Event() when $default != null:
-return $default(_that.id,_that.calendarId,_that.baseEventId,_that.title,_that.description,_that.location,_that.startDateTime,_that.endDateTime,_that.allDay,_that.timezone,_that.recurrenceRule,_that.isException,_that.recurrenceExceptionDate,_that.reminders);case _:
+return $default(_that.id,_that.calendarId,_that.baseEventId,_that.title,_that.description,_that.location,_that.startDateTime,_that.endDateTime,_that.allDay,_that.timezone,_that.recurrenceRule,_that.isException,_that.recurrenceExceptionDate,_that.reminders,_that.createdAt,_that.updatedAt,_that.deletedAt);case _:
   return orElse();
 
 }
@@ -187,10 +190,10 @@ return $default(_that.id,_that.calendarId,_that.baseEventId,_that.title,_that.de
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String calendarId,  String? baseEventId,  String title,  String description,  String location,  DateTime startDateTime,  DateTime endDateTime,  bool allDay,  String timezone,  String? recurrenceRule,  bool isException,  DateTime? recurrenceExceptionDate,  List<Map<String, dynamic>> reminders)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String calendarId,  String? baseEventId,  String title,  String description,  String location,  DateTime startDateTime,  DateTime endDateTime,  bool allDay,  String timezone,  String? recurrenceRule,  bool isException,  DateTime? recurrenceExceptionDate,  List<Map<String, dynamic>> reminders,  DateTime? createdAt,  DateTime? updatedAt,  DateTime? deletedAt)  $default,) {final _that = this;
 switch (_that) {
 case _Event():
-return $default(_that.id,_that.calendarId,_that.baseEventId,_that.title,_that.description,_that.location,_that.startDateTime,_that.endDateTime,_that.allDay,_that.timezone,_that.recurrenceRule,_that.isException,_that.recurrenceExceptionDate,_that.reminders);case _:
+return $default(_that.id,_that.calendarId,_that.baseEventId,_that.title,_that.description,_that.location,_that.startDateTime,_that.endDateTime,_that.allDay,_that.timezone,_that.recurrenceRule,_that.isException,_that.recurrenceExceptionDate,_that.reminders,_that.createdAt,_that.updatedAt,_that.deletedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -207,10 +210,10 @@ return $default(_that.id,_that.calendarId,_that.baseEventId,_that.title,_that.de
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String calendarId,  String? baseEventId,  String title,  String description,  String location,  DateTime startDateTime,  DateTime endDateTime,  bool allDay,  String timezone,  String? recurrenceRule,  bool isException,  DateTime? recurrenceExceptionDate,  List<Map<String, dynamic>> reminders)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: '_id')  String id,  String calendarId,  String? baseEventId,  String title,  String description,  String location,  DateTime startDateTime,  DateTime endDateTime,  bool allDay,  String timezone,  String? recurrenceRule,  bool isException,  DateTime? recurrenceExceptionDate,  List<Map<String, dynamic>> reminders,  DateTime? createdAt,  DateTime? updatedAt,  DateTime? deletedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _Event() when $default != null:
-return $default(_that.id,_that.calendarId,_that.baseEventId,_that.title,_that.description,_that.location,_that.startDateTime,_that.endDateTime,_that.allDay,_that.timezone,_that.recurrenceRule,_that.isException,_that.recurrenceExceptionDate,_that.reminders);case _:
+return $default(_that.id,_that.calendarId,_that.baseEventId,_that.title,_that.description,_that.location,_that.startDateTime,_that.endDateTime,_that.allDay,_that.timezone,_that.recurrenceRule,_that.isException,_that.recurrenceExceptionDate,_that.reminders,_that.createdAt,_that.updatedAt,_that.deletedAt);case _:
   return null;
 
 }
@@ -222,10 +225,10 @@ return $default(_that.id,_that.calendarId,_that.baseEventId,_that.title,_that.de
 @JsonSerializable()
 
 class _Event implements Event {
-  const _Event({required this.id, required this.calendarId, this.baseEventId, required this.title, this.description = '', this.location = '', required this.startDateTime, required this.endDateTime, this.allDay = false, this.timezone = 'UTC', this.recurrenceRule, this.isException = false, this.recurrenceExceptionDate, final  List<Map<String, dynamic>> reminders = const []}): _reminders = reminders;
+  const _Event({@JsonKey(name: '_id') required this.id, required this.calendarId, this.baseEventId, required this.title, this.description = '', this.location = '', required this.startDateTime, required this.endDateTime, this.allDay = false, this.timezone = 'UTC', this.recurrenceRule, this.isException = false, this.recurrenceExceptionDate, final  List<Map<String, dynamic>> reminders = const [], this.createdAt, this.updatedAt, this.deletedAt}): _reminders = reminders;
   factory _Event.fromJson(Map<String, dynamic> json) => _$EventFromJson(json);
 
-@override final  String id;
+@override@JsonKey(name: '_id') final  String id;
 @override final  String calendarId;
 @override final  String? baseEventId;
 @override final  String title;
@@ -245,6 +248,9 @@ class _Event implements Event {
   return EqualUnmodifiableListView(_reminders);
 }
 
+@override final  DateTime? createdAt;
+@override final  DateTime? updatedAt;
+@override final  DateTime? deletedAt;
 
 /// Create a copy of Event
 /// with the given fields replaced by the non-null parameter values.
@@ -259,16 +265,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Event&&(identical(other.id, id) || other.id == id)&&(identical(other.calendarId, calendarId) || other.calendarId == calendarId)&&(identical(other.baseEventId, baseEventId) || other.baseEventId == baseEventId)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.location, location) || other.location == location)&&(identical(other.startDateTime, startDateTime) || other.startDateTime == startDateTime)&&(identical(other.endDateTime, endDateTime) || other.endDateTime == endDateTime)&&(identical(other.allDay, allDay) || other.allDay == allDay)&&(identical(other.timezone, timezone) || other.timezone == timezone)&&(identical(other.recurrenceRule, recurrenceRule) || other.recurrenceRule == recurrenceRule)&&(identical(other.isException, isException) || other.isException == isException)&&(identical(other.recurrenceExceptionDate, recurrenceExceptionDate) || other.recurrenceExceptionDate == recurrenceExceptionDate)&&const DeepCollectionEquality().equals(other._reminders, _reminders));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Event&&(identical(other.id, id) || other.id == id)&&(identical(other.calendarId, calendarId) || other.calendarId == calendarId)&&(identical(other.baseEventId, baseEventId) || other.baseEventId == baseEventId)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.location, location) || other.location == location)&&(identical(other.startDateTime, startDateTime) || other.startDateTime == startDateTime)&&(identical(other.endDateTime, endDateTime) || other.endDateTime == endDateTime)&&(identical(other.allDay, allDay) || other.allDay == allDay)&&(identical(other.timezone, timezone) || other.timezone == timezone)&&(identical(other.recurrenceRule, recurrenceRule) || other.recurrenceRule == recurrenceRule)&&(identical(other.isException, isException) || other.isException == isException)&&(identical(other.recurrenceExceptionDate, recurrenceExceptionDate) || other.recurrenceExceptionDate == recurrenceExceptionDate)&&const DeepCollectionEquality().equals(other._reminders, _reminders)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.deletedAt, deletedAt) || other.deletedAt == deletedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,calendarId,baseEventId,title,description,location,startDateTime,endDateTime,allDay,timezone,recurrenceRule,isException,recurrenceExceptionDate,const DeepCollectionEquality().hash(_reminders));
+int get hashCode => Object.hash(runtimeType,id,calendarId,baseEventId,title,description,location,startDateTime,endDateTime,allDay,timezone,recurrenceRule,isException,recurrenceExceptionDate,const DeepCollectionEquality().hash(_reminders),createdAt,updatedAt,deletedAt);
 
 @override
 String toString() {
-  return 'Event(id: $id, calendarId: $calendarId, baseEventId: $baseEventId, title: $title, description: $description, location: $location, startDateTime: $startDateTime, endDateTime: $endDateTime, allDay: $allDay, timezone: $timezone, recurrenceRule: $recurrenceRule, isException: $isException, recurrenceExceptionDate: $recurrenceExceptionDate, reminders: $reminders)';
+  return 'Event(id: $id, calendarId: $calendarId, baseEventId: $baseEventId, title: $title, description: $description, location: $location, startDateTime: $startDateTime, endDateTime: $endDateTime, allDay: $allDay, timezone: $timezone, recurrenceRule: $recurrenceRule, isException: $isException, recurrenceExceptionDate: $recurrenceExceptionDate, reminders: $reminders, createdAt: $createdAt, updatedAt: $updatedAt, deletedAt: $deletedAt)';
 }
 
 
@@ -279,7 +285,7 @@ abstract mixin class _$EventCopyWith<$Res> implements $EventCopyWith<$Res> {
   factory _$EventCopyWith(_Event value, $Res Function(_Event) _then) = __$EventCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String calendarId, String? baseEventId, String title, String description, String location, DateTime startDateTime, DateTime endDateTime, bool allDay, String timezone, String? recurrenceRule, bool isException, DateTime? recurrenceExceptionDate, List<Map<String, dynamic>> reminders
+@JsonKey(name: '_id') String id, String calendarId, String? baseEventId, String title, String description, String location, DateTime startDateTime, DateTime endDateTime, bool allDay, String timezone, String? recurrenceRule, bool isException, DateTime? recurrenceExceptionDate, List<Map<String, dynamic>> reminders, DateTime? createdAt, DateTime? updatedAt, DateTime? deletedAt
 });
 
 
@@ -296,7 +302,7 @@ class __$EventCopyWithImpl<$Res>
 
 /// Create a copy of Event
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? calendarId = null,Object? baseEventId = freezed,Object? title = null,Object? description = null,Object? location = null,Object? startDateTime = null,Object? endDateTime = null,Object? allDay = null,Object? timezone = null,Object? recurrenceRule = freezed,Object? isException = null,Object? recurrenceExceptionDate = freezed,Object? reminders = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? calendarId = null,Object? baseEventId = freezed,Object? title = null,Object? description = null,Object? location = null,Object? startDateTime = null,Object? endDateTime = null,Object? allDay = null,Object? timezone = null,Object? recurrenceRule = freezed,Object? isException = null,Object? recurrenceExceptionDate = freezed,Object? reminders = null,Object? createdAt = freezed,Object? updatedAt = freezed,Object? deletedAt = freezed,}) {
   return _then(_Event(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,calendarId: null == calendarId ? _self.calendarId : calendarId // ignore: cast_nullable_to_non_nullable
@@ -312,7 +318,10 @@ as String,recurrenceRule: freezed == recurrenceRule ? _self.recurrenceRule : rec
 as String?,isException: null == isException ? _self.isException : isException // ignore: cast_nullable_to_non_nullable
 as bool,recurrenceExceptionDate: freezed == recurrenceExceptionDate ? _self.recurrenceExceptionDate : recurrenceExceptionDate // ignore: cast_nullable_to_non_nullable
 as DateTime?,reminders: null == reminders ? _self._reminders : reminders // ignore: cast_nullable_to_non_nullable
-as List<Map<String, dynamic>>,
+as List<Map<String, dynamic>>,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,deletedAt: freezed == deletedAt ? _self.deletedAt : deletedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 

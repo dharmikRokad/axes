@@ -21,8 +21,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       next.maybeMap(
         authenticated: (_) => context.go('/'),
         failure: (f) => ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(f.message))),
+            context,
+          ).showSnackBar(SnackBar(content: Text(f.message))),
         orElse: () {},
       );
     });
