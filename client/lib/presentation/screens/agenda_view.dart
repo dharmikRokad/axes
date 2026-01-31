@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../application/event/event_notifier.dart';
+import '../../application/calendar/calendar_notifier.dart';
+import '../widgets/event_editor_dialog.dart';
 
 class AgendaView extends ConsumerStatefulWidget {
   const AgendaView({super.key});
@@ -23,6 +25,14 @@ class _AgendaViewState extends ConsumerState<AgendaView> {
   @override
   Widget build(BuildContext context) {
     final eventsAsync = ref.watch(eventListProvider);
+    final selectedIds = ref.watch(selectedCalendarIdsProvider);
+    final calendarsAsync = ref.watch(calendarListProvider);
+
+    ref.listen(selectedCalendarIdsProvider, (previous, next) {
+      final from = DateTime.now();
+      final to = from.add(const Duration(days: 30));
+      ref.read(eventListProvider.notifier).loadEvents(from: from, to: to);
+    });
 
     return eventsAsync.when(
       data: (events) {
@@ -30,9 +40,10 @@ class _AgendaViewState extends ConsumerState<AgendaView> {
           return const Center(child: Text('No upcoming events'));
         }
 
-        // Group events by date
+        // Group events by date and filter by selected calendars
         final groupedEvents = <String, List<dynamic>>{};
         for (final event in events) {
+          if (!selectedIds.contains(event.calendarId)) continue;
           final dateKey = DateFormat('yyyy-MM-dd').format(event.startDateTime);
           groupedEvents.putIfAbsent(dateKey, () => []).add(event);
         }
@@ -63,7 +74,19 @@ class _AgendaViewState extends ConsumerState<AgendaView> {
                     leading: Container(
                       width: 4,
                       height: 40,
-                      color: Colors.blue,
+                      color: calendarsAsync.when(
+                        data: (calendars) {
+                          final calendar = calendars.firstWhere(
+                            (c) => c.id == event.calendarId,
+                            orElse: () => calendars.first,
+                          );
+                          return Color(
+                            int.parse(calendar.color.replaceFirst('#', '0xFF')),
+                          );
+                        },
+                        loading: () => Colors.blue,
+                        error: (_, __) => Colors.blue,
+                      ),
                     ),
                     title: Text(event.title),
                     subtitle: Text(event.description),
@@ -71,10 +94,13 @@ class _AgendaViewState extends ConsumerState<AgendaView> {
                       DateFormat('h:mm a').format(event.startDateTime),
                     ),
                     onTap: () {
-                      // TODO: Show event details
+                      showDialog(
+                        context: context,
+                        builder: (context) => EventEditorDialog(event: event),
+                      );
                     },
                   );
-                }).toList(),
+                }),
                 const Divider(),
               ],
             );

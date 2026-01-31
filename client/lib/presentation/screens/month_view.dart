@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../../application/event/event_notifier.dart';
 import '../../domain/entities/event.dart';
+import '../widgets/event_editor_dialog.dart';
+import '../../application/calendar/calendar_notifier.dart';
 
 class MonthView extends ConsumerStatefulWidget {
   const MonthView({super.key});
@@ -32,6 +34,11 @@ class _MonthViewState extends ConsumerState<MonthView> {
   @override
   Widget build(BuildContext context) {
     final eventsAsync = ref.watch(eventListProvider);
+    final selectedIds = ref.watch(selectedCalendarIdsProvider);
+
+    ref.listen(selectedCalendarIdsProvider, (previous, next) {
+      _loadEventsForMonth();
+    });
 
     return Column(
       children: [
@@ -52,7 +59,11 @@ class _MonthViewState extends ConsumerState<MonthView> {
           },
           eventLoader: (day) {
             return eventsAsync.value
-                    ?.where((e) => isSameDay(e.startDateTime, day))
+                    ?.where(
+                      (e) =>
+                          isSameDay(e.startDateTime, day) &&
+                          selectedIds.contains(e.calendarId),
+                    )
                     .toList() ??
                 [];
           },
@@ -63,7 +74,11 @@ class _MonthViewState extends ConsumerState<MonthView> {
             data: (events) {
               final selectedEvents = _selectedDay != null
                   ? events
-                        .where((e) => isSameDay(e.startDateTime, _selectedDay!))
+                        .where(
+                          (e) =>
+                              isSameDay(e.startDateTime, _selectedDay!) &&
+                              selectedIds.contains(e.calendarId),
+                        )
                         .toList()
                   : <Event>[];
 
@@ -80,6 +95,12 @@ class _MonthViewState extends ConsumerState<MonthView> {
                     subtitle: Text(
                       '${event.startDateTime.hour}:${event.startDateTime.minute.toString().padLeft(2, '0')}',
                     ),
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => EventEditorDialog(event: event),
+                      );
+                    },
                     trailing: IconButton(
                       icon: const Icon(Icons.delete),
                       onPressed: () => ref

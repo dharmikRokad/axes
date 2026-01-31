@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../application/event/event_notifier.dart';
 import '../../domain/entities/event.dart';
+import '../widgets/event_editor_dialog.dart';
+import '../../application/calendar/calendar_notifier.dart';
 
 class DayView extends ConsumerStatefulWidget {
   const DayView({super.key});
@@ -46,6 +48,11 @@ class _DayViewState extends ConsumerState<DayView> {
   @override
   Widget build(BuildContext context) {
     final eventsAsync = ref.watch(eventListProvider);
+    final selectedIds = ref.watch(selectedCalendarIdsProvider);
+
+    ref.listen(selectedCalendarIdsProvider, (previous, next) {
+      _loadEventsForDay();
+    });
 
     return Column(
       children: [
@@ -56,7 +63,8 @@ class _DayViewState extends ConsumerState<DayView> {
               final todayEvents = events.where((e) {
                 return e.startDateTime.year == _selectedDay.year &&
                     e.startDateTime.month == _selectedDay.month &&
-                    e.startDateTime.day == _selectedDay.day;
+                    e.startDateTime.day == _selectedDay.day &&
+                    selectedIds.contains(e.calendarId);
               }).toList();
               return _buildTimeGrid(todayEvents);
             },
@@ -229,7 +237,10 @@ class _DayViewState extends ConsumerState<DayView> {
       height: height,
       child: GestureDetector(
         onTap: () {
-          // TODO: Show event details
+          showDialog(
+            context: context,
+            builder: (context) => EventEditorDialog(event: event),
+          );
         },
         child: Container(
           padding: const EdgeInsets.all(8),

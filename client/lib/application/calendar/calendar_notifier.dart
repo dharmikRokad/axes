@@ -13,23 +13,39 @@ final calendarListProvider =
     StateNotifierProvider<CalendarListNotifier, AsyncValue<List<Calendar>>>((
       ref,
     ) {
-      return CalendarListNotifier(ref.watch(calendarRepositoryProvider));
+      return CalendarListNotifier(ref);
     });
+
+final selectedCalendarIdsProvider = StateProvider<Set<String>>(
+  (ref) => <String>{},
+);
 
 class CalendarListNotifier extends StateNotifier<AsyncValue<List<Calendar>>> {
   final CalendarRepository _repository;
 
-  CalendarListNotifier(this._repository) : super(const AsyncValue.loading()) {
+  final Ref _ref;
+
+  CalendarListNotifier(this._ref)
+    : _repository = _ref.read(calendarRepositoryProvider),
+      super(const AsyncValue.loading()) {
     getCalendars();
   }
 
   Future<void> getCalendars() async {
     state = const AsyncValue.loading();
     final result = await _repository.getCalendars();
-    state = result.fold(
-      (l) => AsyncValue.error(l, StackTrace.current),
-      (r) => AsyncValue.data(r),
-    );
+    state = result.fold((l) => AsyncValue.error(l, StackTrace.current), (r) {
+      // Use microtask to avoid modifying providers during build if getCalendars is called synchronously
+      Future.microtask(() {
+        final currentSelected = _ref.read(selectedCalendarIdsProvider);
+        if (currentSelected.isEmpty) {
+          _ref.read(selectedCalendarIdsProvider.notifier).state = r
+              .map((c) => c.id)
+              .toSet();
+        }
+      });
+      return AsyncValue.data(r);
+    });
   }
 
   Future<void> createCalendar(String name, String color) async {
@@ -39,6 +55,13 @@ class CalendarListNotifier extends StateNotifier<AsyncValue<List<Calendar>>> {
       (newCalendar) {
         final currentList = state.value ?? [];
         state = AsyncValue.data([...currentList, newCalendar]);
+
+        // Automatically select the newly created calendar
+        final currentSelected = _ref.read(selectedCalendarIdsProvider);
+        _ref.read(selectedCalendarIdsProvider.notifier).state = {
+          ...currentSelected,
+          newCalendar.id,
+        };
       },
     );
   }

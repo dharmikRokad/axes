@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../application/event/event_notifier.dart';
 import '../../domain/entities/event.dart';
+import '../widgets/event_editor_dialog.dart';
+import '../../application/calendar/calendar_notifier.dart';
 
 class WeekView extends ConsumerStatefulWidget {
   const WeekView({super.key});
@@ -48,13 +50,18 @@ class _WeekViewState extends ConsumerState<WeekView> {
   @override
   Widget build(BuildContext context) {
     final eventsAsync = ref.watch(eventListProvider);
+    final selectedIds = ref.watch(selectedCalendarIdsProvider);
+
+    ref.listen(selectedCalendarIdsProvider, (previous, next) {
+      _loadEventsForWeek();
+    });
 
     return Column(
       children: [
         _buildWeekHeader(),
         Expanded(
           child: eventsAsync.when(
-            data: (events) => _buildTimeGrid(events),
+            data: (events) => _buildTimeGrid(events, selectedIds),
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (err, stack) => Center(child: Text('Error: $err')),
           ),
@@ -101,7 +108,7 @@ class _WeekViewState extends ConsumerState<WeekView> {
     );
   }
 
-  Widget _buildTimeGrid(List<Event> events) {
+  Widget _buildTimeGrid(List<Event> events, Set<String> selectedIds) {
     return SingleChildScrollView(
       controller: _scrollController,
       child: Row(
@@ -117,7 +124,8 @@ class _WeekViewState extends ConsumerState<WeekView> {
                 final dayEvents = events.where((e) {
                   return e.startDateTime.year == day.year &&
                       e.startDateTime.month == day.month &&
-                      e.startDateTime.day == day.day;
+                      e.startDateTime.day == day.day &&
+                      selectedIds.contains(e.calendarId);
                 }).toList();
                 return Expanded(child: _buildDayColumn(day, dayEvents));
               }),
@@ -207,7 +215,10 @@ class _WeekViewState extends ConsumerState<WeekView> {
       height: duration * 60,
       child: GestureDetector(
         onTap: () {
-          // TODO: Show event details dialog
+          showDialog(
+            context: context,
+            builder: (context) => EventEditorDialog(event: event),
+          );
         },
         child: Container(
           padding: const EdgeInsets.all(4),

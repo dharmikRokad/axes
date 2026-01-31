@@ -4,6 +4,7 @@ import '../../domain/entities/event.dart';
 import '../../domain/repositories/event_repository.dart';
 import '../../data/repositories/event_repository_impl.dart';
 import '../../presentation/core/providers.dart';
+import '../calendar/calendar_notifier.dart';
 
 final eventRepositoryProvider = Provider<EventRepository>((ref) {
   return EventRepositoryImpl(ref.watch(dioProvider));
@@ -11,24 +12,43 @@ final eventRepositoryProvider = Provider<EventRepository>((ref) {
 
 final eventListProvider =
     StateNotifierProvider<EventListNotifier, AsyncValue<List<Event>>>((ref) {
-      return EventListNotifier(ref.watch(eventRepositoryProvider));
+      return EventListNotifier(ref);
     });
 
 class EventListNotifier extends StateNotifier<AsyncValue<List<Event>>> {
   final EventRepository _repository;
+  final Ref ref;
+  DateTime? _lastFrom;
+  DateTime? _lastTo;
 
-  EventListNotifier(this._repository) : super(const AsyncValue.loading());
+  EventListNotifier(this.ref)
+    : _repository = ref.read(eventRepositoryProvider),
+      super(const AsyncValue.loading());
 
   Future<void> loadEvents({
     List<String>? calendarIds,
     DateTime? from,
     DateTime? to,
   }) async {
+    if (from != null) _lastFrom = from;
+    if (to != null) _lastTo = to;
+
+    final currentFrom = from ?? _lastFrom;
+    final currentTo = to ?? _lastTo;
+
     state = const AsyncValue.loading();
+
+    final ids = calendarIds ?? ref.read(selectedCalendarIdsProvider).toList();
+
+    if (ids.isEmpty) {
+      state = const AsyncValue.data([]);
+      return;
+    }
+
     final result = await _repository.getEvents(
-      calendarIds: calendarIds,
-      from: from,
-      to: to,
+      calendarIds: ids,
+      from: currentFrom,
+      to: currentTo,
     );
     state = result.fold(
       (l) => AsyncValue.error(l, StackTrace.current),
@@ -46,14 +66,14 @@ class EventListNotifier extends StateNotifier<AsyncValue<List<Event>>> {
 
   Future<void> updateEvent(String id, Map<String, dynamic> updates) async {
     final result = await _repository.updateEvent(id, updates);
-    result.fold((l) => null, (_) {
+    result.fold((l) => null, (updatedEvent) {
       final currentList = state.value ?? [];
       state = AsyncValue.data(
         currentList.map((e) {
           if (e.id == id) {
-            // This is a bit simplified, ideally we fetch the updated event
-            // but for now we'll assume the updates were successful
-            return Event.fromJson({...e.toJson(), ...updates});
+            // Merge the updates into the existing event
+            // Ideally the repository returns the full updated event
+            return updatedEvent;
           }
           return e;
         }).toList(),

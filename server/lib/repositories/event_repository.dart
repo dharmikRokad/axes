@@ -15,7 +15,10 @@ class EventRepository {
     final selector = where.eq('deletedAt', null).sortBy('startDateTime');
 
     if (calendarIds != null && calendarIds.isNotEmpty) {
-      selector.oneFrom('calendarId', calendarIds);
+      selector.oneFrom(
+        'calendarId',
+        calendarIds.map((id) => ObjectId.parse(id)).toList(),
+      );
     }
 
     if (from != null || to != null) {
@@ -26,13 +29,7 @@ class EventRepository {
     }
 
     final results = await _events.find(selector).toList();
-    final events = results.map((data) {
-      data['_id'] = (data['_id'] as ObjectId).toHexString();
-      if (data['calendarId'] is ObjectId) {
-        data['calendarId'] = (data['calendarId'] as ObjectId).toHexString();
-      }
-      return Event.fromJson(data);
-    }).toList();
+    final events = results.map(_sanitizeEventMap).toList();
 
     // Expand recurring events if date range is provided
     if (from != null && to != null) {
@@ -56,15 +53,36 @@ class EventRepository {
     return events;
   }
 
-  Future<Event?> getEventById(String id) async {
-    final data = await _events.findOne(where.id(ObjectId.parse(id)));
-    if (data == null) return null;
-
+  Event _sanitizeEventMap(Map<String, dynamic> data) {
     data['_id'] = (data['_id'] as ObjectId).toHexString();
     if (data['calendarId'] is ObjectId) {
       data['calendarId'] = (data['calendarId'] as ObjectId).toHexString();
     }
+
+    // Convert DateTime to ISO8601 strings for JSON serialization
+    final dateFields = [
+      'startDateTime',
+      'endDateTime',
+      'recurrenceExceptionDate',
+      'createdAt',
+      'updatedAt',
+      'deletedAt',
+    ];
+
+    for (final field in dateFields) {
+      if (data[field] is DateTime) {
+        data[field] = (data[field] as DateTime).toIso8601String();
+      }
+    }
+
     return Event.fromJson(data);
+  }
+
+  Future<Event?> getEventById(String id) async {
+    final data = await _events.findOne(where.id(ObjectId.parse(id)));
+    if (data == null) return null;
+
+    return _sanitizeEventMap(data);
   }
 
   Future<Event> createEvent(Event event) async {
@@ -76,6 +94,13 @@ class EventRepository {
     json['calendarId'] = ObjectId.parse(event.calendarId);
     json['createdAt'] = now;
     json['updatedAt'] = now;
+
+    // Ensure dates are stored as DateTime objects for MongoDB ISODate
+    json['startDateTime'] = event.startDateTime;
+    json['endDateTime'] = event.endDateTime;
+    if (event.recurrenceExceptionDate != null) {
+      json['recurrenceExceptionDate'] = event.recurrenceExceptionDate;
+    }
 
     await _events.insert(json);
 
@@ -99,6 +124,7 @@ class EventRepository {
       'allDay',
       'timezone',
       'recurrenceRule',
+      'recurrenceExceptionDate',
     ];
 
     for (final field in fields) {
@@ -106,7 +132,9 @@ class EventRepository {
         var value = updates[field];
         if (field == 'calendarId' && value is String) {
           value = ObjectId.parse(value);
-        } else if ((field == 'startDateTime' || field == 'endDateTime') &&
+        } else if ((field == 'startDateTime' ||
+                field == 'endDateTime' ||
+                field == 'recurrenceExceptionDate') &&
             value is String) {
           value = DateTime.parse(value);
         }

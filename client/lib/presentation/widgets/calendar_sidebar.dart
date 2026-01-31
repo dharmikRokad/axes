@@ -37,15 +37,51 @@ class CalendarSidebar extends ConsumerWidget {
                 itemCount: calendars.length,
                 itemBuilder: (context, index) {
                   final calendar = calendars[index];
+                  final isSelected = ref
+                      .watch(selectedCalendarIdsProvider)
+                      .contains(calendar.id);
+
                   return ListTile(
-                    leading: Icon(
-                      Icons.circle,
-                      color: Color(
+                    leading: Checkbox(
+                      value: isSelected,
+                      activeColor: Color(
                         int.parse(calendar.color.replaceAll('#', '0xFF')),
                       ),
+                      side: BorderSide(
+                        color: Color(
+                          int.parse(calendar.color.replaceAll('#', '0xFF')),
+                        ),
+                        width: 2,
+                      ),
+                      onChanged: (value) {
+                        final currentSelected = ref.read(
+                          selectedCalendarIdsProvider,
+                        );
+                        final newSelected = Set<String>.from(currentSelected);
+                        if (value == true) {
+                          newSelected.add(calendar.id);
+                        } else {
+                          newSelected.remove(calendar.id);
+                        }
+                        ref.read(selectedCalendarIdsProvider.notifier).state =
+                            newSelected;
+                      },
                     ),
                     title: Text(calendar.name),
                     dense: true,
+                    onTap: () {
+                      final currentSelected = ref.read(
+                        selectedCalendarIdsProvider,
+                      );
+                      final newSelected = Set<String>.from(currentSelected);
+                      if (isSelected) {
+                        newSelected.remove(calendar.id);
+                      } else {
+                        newSelected.add(calendar.id);
+                      }
+                      ref.read(selectedCalendarIdsProvider.notifier).state =
+                          newSelected;
+                    },
                     trailing: PopupMenuButton<String>(
                       onSelected: (value) {
                         if (value == 'edit') {
@@ -62,9 +98,6 @@ class CalendarSidebar extends ConsumerWidget {
                         ),
                       ],
                     ),
-                    onTap: () {
-                      // Toggle visibility in future
-                    },
                   );
                 },
               ),
@@ -77,31 +110,94 @@ class CalendarSidebar extends ConsumerWidget {
     );
   }
 
+  static const List<String> _colors = [
+    '#D50000', // Tomato
+    '#E67C73', // Flamingo
+    '#F4511E', // Tangerine
+    '#F6BF26', // Banana
+    '#33B864', // Sage
+    '#0B8043', // Basil
+    '#039BE5', // Peacock
+    '#3F51B5', // Blueberry
+    '#7986CB', // Lavender
+    '#8E24AA', // Grape
+    '#616161', // Graphite
+  ];
+
   void _showCreateCalendarDialog(BuildContext context, WidgetRef ref) {
     final nameController = TextEditingController();
+    String selectedColor = _colors[0];
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Create Calendar'),
-        content: TextField(
-          controller: nameController,
-          decoration: const InputDecoration(labelText: 'Calendar Name'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              ref
-                  .read(calendarListProvider.notifier)
-                  .createCalendar(nameController.text, '#FF5722');
-              Navigator.pop(context);
-            },
-            child: const Text('Create'),
-          ),
-        ],
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: const Text('Create Calendar'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nameController,
+                  decoration: const InputDecoration(labelText: 'Calendar Name'),
+                ),
+                const SizedBox(height: 16),
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('Select Color:'),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: _colors.map((color) {
+                    final isSelected = selectedColor == color;
+                    return GestureDetector(
+                      onTap: () => setState(() => selectedColor = color),
+                      child: Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: Color(
+                            int.parse(color.replaceAll('#', '0xFF')),
+                          ),
+                          shape: BoxShape.circle,
+                          border: isSelected
+                              ? Border.all(color: Colors.black, width: 2)
+                              : null,
+                        ),
+                        child: isSelected
+                            ? const Icon(
+                                Icons.check,
+                                size: 20,
+                                color: Colors.white,
+                              )
+                            : null,
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  if (nameController.text.isNotEmpty) {
+                    ref
+                        .read(calendarListProvider.notifier)
+                        .createCalendar(nameController.text, selectedColor);
+                    Navigator.pop(context);
+                  }
+                },
+                child: const Text('Create'),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -112,33 +208,80 @@ class CalendarSidebar extends ConsumerWidget {
     Calendar calendar,
   ) {
     final nameController = TextEditingController(text: calendar.name);
+    String selectedColor = calendar.color;
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Edit Calendar'),
-        content: TextField(
-          controller: nameController,
-          decoration: const InputDecoration(labelText: 'Calendar Name'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              ref
-                  .read(calendarListProvider.notifier)
-                  .updateCalendar(
-                    calendar.id,
-                    nameController.text,
-                    calendar.color,
-                  );
-              Navigator.pop(context);
-            },
-            child: const Text('Save'),
-          ),
-        ],
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: const Text('Edit Calendar'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nameController,
+                  decoration: const InputDecoration(labelText: 'Calendar Name'),
+                ),
+                const SizedBox(height: 16),
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('Select Color:'),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: _colors.map((color) {
+                    final isSelected = selectedColor == color;
+                    return GestureDetector(
+                      onTap: () => setState(() => selectedColor = color),
+                      child: Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: Color(
+                            int.parse(color.replaceAll('#', '0xFF')),
+                          ),
+                          shape: BoxShape.circle,
+                          border: isSelected
+                              ? Border.all(color: Colors.black, width: 2)
+                              : null,
+                        ),
+                        child: isSelected
+                            ? const Icon(
+                                Icons.check,
+                                size: 20,
+                                color: Colors.white,
+                              )
+                            : null,
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  ref
+                      .read(calendarListProvider.notifier)
+                      .updateCalendar(
+                        calendar.id,
+                        nameController.text,
+                        selectedColor,
+                      );
+                  Navigator.pop(context);
+                },
+                child: const Text('Save'),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

@@ -121,7 +121,7 @@ class _EventEditorDialogState extends ConsumerState<EventEditorDialog> {
                       _selectedCalendarId = calendars.first.id;
                     }
                     return DropdownButtonFormField<String>(
-                      value: _selectedCalendarId,
+                      initialValue: _selectedCalendarId,
                       decoration: const InputDecoration(
                         labelText: 'Calendar',
                         border: OutlineInputBorder(),
@@ -187,7 +187,7 @@ class _EventEditorDialogState extends ConsumerState<EventEditorDialog> {
 
                 if (_isRecurring) ...[
                   DropdownButtonFormField<String>(
-                    value: _frequency,
+                    initialValue: _frequency,
                     decoration: const InputDecoration(
                       labelText: 'Frequency',
                       border: OutlineInputBorder(),
@@ -272,8 +272,21 @@ class _EventEditorDialogState extends ConsumerState<EventEditorDialog> {
 
                 // Actions
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
+                    if (widget.event != null)
+                      TextButton(
+                        onPressed: () {
+                          ref
+                              .read(eventListProvider.notifier)
+                              .deleteEvent(widget.event!.id);
+                          Navigator.of(context).pop();
+                        },
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.red,
+                        ),
+                        child: const Text('Delete'),
+                      ),
+                    const Spacer(),
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(),
                       child: const Text('Cancel'),
@@ -331,7 +344,7 @@ class _EventEditorDialogState extends ConsumerState<EventEditorDialog> {
     }
   }
 
-  void _saveEvent() {
+  Future<void> _saveEvent() async {
     if (!_formKey.currentState!.validate() || _selectedCalendarId == null) {
       return;
     }
@@ -349,20 +362,22 @@ class _EventEditorDialogState extends ConsumerState<EventEditorDialog> {
     );
 
     if (widget.event == null) {
-      ref.read(eventListProvider.notifier).createEvent(event);
+      await ref.read(eventListProvider.notifier).createEvent(event);
     } else {
-      ref.read(eventListProvider.notifier).updateEvent(event.id, {
-        'title': event.title,
-        'description': event.description,
-        'location': event.location,
-        'startDateTime': event.startDateTime.toIso8601String(),
-        'endDateTime': event.endDateTime.toIso8601String(),
-        'allDay': event.allDay,
-        'recurrenceRule': event.recurrenceRule,
-        'calendarId': event.calendarId,
+      await ref.read(eventListProvider.notifier).updateEvent(event.id, {
+        'title': _titleController.text,
+        'description': _descriptionController.text,
+        'location': _locationController.text,
+        'startDateTime': _startDateTime.toIso8601String(),
+        'endDateTime': _endDateTime.toIso8601String(),
+        'allDay': _allDay,
+        'recurrenceRule': _buildRecurrenceRule(),
+        'calendarId': _selectedCalendarId,
       });
     }
 
-    Navigator.of(context).pop();
+    if (context.mounted) {
+      Navigator.of(context).pop();
+    }
   }
 }
