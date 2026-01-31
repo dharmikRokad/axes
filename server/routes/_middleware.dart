@@ -1,4 +1,5 @@
 import 'package:axes_server/data_sources/mongo_data_source.dart';
+import 'package:axes_server/repositories/calendar_repository.dart';
 import 'package:axes_server/repositories/event_repository.dart';
 import 'package:axes_server/repositories/user_repository.dart';
 import 'package:axes_server/services/password_service.dart';
@@ -7,10 +8,10 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:dotenv/dotenv.dart';
 import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 
-
 // Services
 final _userRepository = UserRepository();
 final _eventRepository = EventRepository();
+final _calendarRepository = CalendarRepository();
 final _passwordService = PasswordService();
 final _tokenService = TokenService();
 
@@ -42,6 +43,7 @@ Handler middleware(Handler handler) {
       })
       .use(provider<UserRepository>((_) => _userRepository))
       .use(provider<EventRepository>((_) => _eventRepository))
+      .use(provider<CalendarRepository>((_) => _calendarRepository))
       .use(provider<PasswordService>((_) => _passwordService))
       .use(provider<TokenService>((_) => _tokenService));
 }

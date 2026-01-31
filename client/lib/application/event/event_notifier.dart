@@ -44,6 +44,23 @@ class EventListNotifier extends StateNotifier<AsyncValue<List<Event>>> {
     });
   }
 
+  Future<void> updateEvent(String id, Map<String, dynamic> updates) async {
+    final result = await _repository.updateEvent(id, updates);
+    result.fold((l) => null, (_) {
+      final currentList = state.value ?? [];
+      state = AsyncValue.data(
+        currentList.map((e) {
+          if (e.id == id) {
+            // This is a bit simplified, ideally we fetch the updated event
+            // but for now we'll assume the updates were successful
+            return Event.fromJson({...e.toJson(), ...updates});
+          }
+          return e;
+        }).toList(),
+      );
+    });
+  }
+
   Future<void> deleteEvent(String id) async {
     await _repository.deleteEvent(id);
     final currentList = state.value ?? [];

@@ -42,4 +42,27 @@ class CalendarListNotifier extends StateNotifier<AsyncValue<List<Calendar>>> {
       },
     );
   }
+
+  Future<void> updateCalendar(String id, String name, String color) async {
+    final result = await _repository.updateCalendar(id, name, color);
+    result.fold((l) => null, (_) {
+      final currentList = state.value ?? [];
+      state = AsyncValue.data(
+        currentList.map((c) {
+          if (c.id == id) {
+            return c.copyWith(name: name, color: color);
+          }
+          return c;
+        }).toList(),
+      );
+    });
+  }
+
+  Future<void> deleteCalendar(String id) async {
+    final result = await _repository.deleteCalendar(id);
+    result.fold((l) => null, (_) {
+      final currentList = state.value ?? [];
+      state = AsyncValue.data(currentList.where((c) => c.id != id).toList());
+    });
+  }
 }

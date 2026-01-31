@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:axes_server/data_sources/mongo_data_source.dart';
+import 'package:axes_server/repositories/calendar_repository.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
@@ -11,29 +11,27 @@ Future<Response> onRequest(RequestContext context) async {
   if (authHeader == null || !authHeader.startsWith('Bearer ')) {
     return Response(statusCode: HttpStatus.unauthorized);
   }
-  final token = authHeader.substring(7);
-  // In a real app, use the TokenService to verify and extract user
-  // For brevity here, we assume middleware or simple verification
-  // We'll just check if it's a valid token structure or verify strictly if injected
 
-  // To keep it clean, let's assume valid user for now or fail if strict:
-  // final tokenService = context.read<TokenService>();
-  // final jwt = tokenService.verify(token); ...
+  final calendarRepo = context.read<CalendarRepository>();
 
   switch (context.request.method) {
     case HttpMethod.get:
-      return _getCalendars(context);
+      return _getCalendars(context, calendarRepo);
     case HttpMethod.post:
-      return _createCalendar(context);
+      return _createCalendar(context, calendarRepo);
     default:
       return Response(statusCode: HttpStatus.methodNotAllowed);
   }
 }
 
-Future<Response> _getCalendars(RequestContext context) async {
-  final db = MongoDataSource.db;
-  // TODO: Filter by ownerId from JWT
-  final calendars = await db.collection('calendars').find().toList();
+Future<Response> _getCalendars(
+  RequestContext context,
+  CalendarRepository repo,
+) async {
+  // TODO: Extract ownerId from JWT
+  final ownerId = 'TODO_USER_ID';
+  final calendars = await repo.getCalendars(ownerId);
+
   // Transform ObjectId to String and DateTime to ISO string
   final result = calendars.map((c) {
     c['id'] = (c['_id'] as ObjectId).toHexString();
@@ -48,11 +46,11 @@ Future<Response> _getCalendars(RequestContext context) async {
   return Response.json(body: result);
 }
 
-Future<Response> _createCalendar(RequestContext context) async {
+Future<Response> _createCalendar(
+  RequestContext context,
+  CalendarRepository repo,
+) async {
   final body = await context.request.json() as Map<String, dynamic>;
-  // Validate body...
-
-  final db = MongoDataSource.db;
   final id = ObjectId();
   final now = DateTime.now();
   final calendar = {
@@ -63,14 +61,16 @@ Future<Response> _createCalendar(RequestContext context) async {
     'createdAt': now,
   };
 
-  await db.collection('calendars').insert(calendar);
+  await repo.createCalendar(calendar);
 
   // Return JSON-serializable response
-  return Response.json(body: {
-    'id': id.toHexString(),
-    'name': body['name'],
-    'color': body['color'],
-    'ownerId': 'TODO_USER_ID',
-    'createdAt': now.toIso8601String(),
-  });
+  return Response.json(
+    body: {
+      'id': id.toHexString(),
+      'name': body['name'],
+      'color': body['color'],
+      'ownerId': 'TODO_USER_ID',
+      'createdAt': now.toIso8601String(),
+    },
+  );
 }

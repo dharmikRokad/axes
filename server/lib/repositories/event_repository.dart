@@ -87,15 +87,34 @@ class EventRepository {
   }
 
   Future<Event?> updateEvent(String id, Map<String, dynamic> updates) async {
-    updates['updatedAt'] = DateTime.now();
+    final modifier = modify.set('updatedAt', DateTime.now());
 
-    await _events.updateOne(
-      where.id(ObjectId.parse(id)),
-      modify
-          .set('updatedAt', updates['updatedAt'])
-          .set('title', updates['title'] ?? ''),
-    );
+    final fields = [
+      'calendarId',
+      'title',
+      'description',
+      'location',
+      'startDateTime',
+      'endDateTime',
+      'allDay',
+      'timezone',
+      'recurrenceRule',
+    ];
 
+    for (final field in fields) {
+      if (updates.containsKey(field)) {
+        var value = updates[field];
+        if (field == 'calendarId' && value is String) {
+          value = ObjectId.parse(value);
+        } else if ((field == 'startDateTime' || field == 'endDateTime') &&
+            value is String) {
+          value = DateTime.parse(value);
+        }
+        modifier.set(field, value);
+      }
+    }
+
+    await _events.updateOne(where.id(ObjectId.parse(id)), modifier);
     return getEventById(id);
   }
 

@@ -350,6 +350,17 @@ class _EventEditorDialogState extends ConsumerState<EventEditorDialog> {
 
     if (widget.event == null) {
       ref.read(eventListProvider.notifier).createEvent(event);
+    } else {
+      ref.read(eventListProvider.notifier).updateEvent(event.id, {
+        'title': event.title,
+        'description': event.description,
+        'location': event.location,
+        'startDateTime': event.startDateTime.toIso8601String(),
+        'endDateTime': event.endDateTime.toIso8601String(),
+        'allDay': event.allDay,
+        'recurrenceRule': event.recurrenceRule,
+        'calendarId': event.calendarId,
+      });
     }
 
     Navigator.of(context).pop();

@@ -37,6 +37,20 @@ class CalendarRepositoryImpl implements CalendarRepository {
   }
 
   @override
+  Future<Either<String, Unit>> updateCalendar(
+    String id,
+    String name,
+    String color,
+  ) async {
+    try {
+      await _dio.patch('/calendars/$id', data: {'name': name, 'color': color});
+      return right(unit);
+    } catch (e) {
+      return left(e.toString());
+    }
+  }
+
+  @override
   Future<Either<String, Unit>> deleteCalendar(String id) async {
     try {
       await _dio.delete('/calendars/$id');
