@@ -241,7 +241,7 @@ class _DayViewState extends ConsumerState<DayView> {
     final durationMinutes = endMinutes - startMinutes;
 
     final topOffset = (startMinutes / 60) * 80;
-    final height = (durationMinutes / 60) * 80;
+    final height = (durationMinutes / 60) * 85;
 
     final calendar = calendars.firstWhere(
       (c) => c.id == event.calendarId,
