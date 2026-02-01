@@ -33,7 +33,7 @@ Handler middleware(Handler handler) {
       .use((handler) {
         return (context) async {
           if (!_envLoaded) {
-            var env = DotEnv(includePlatformEnvironment: true)..load();
+            final env = DotEnv(includePlatformEnvironment: true)..load();
             _envLoaded = true;
             await MongoDataSource.init(env: env);
           }
