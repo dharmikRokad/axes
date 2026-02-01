@@ -9,6 +9,8 @@ import 'week_view.dart';
 import 'day_view.dart';
 import '../widgets/event_editor_dialog.dart';
 
+enum CalendarView { month, week, day, agenda }
+
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -16,37 +18,46 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 4, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  CalendarView _currentView = CalendarView.month;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Axes Calendar'),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Month'),
-            Tab(text: 'Week'),
-            Tab(text: 'Day'),
-            Tab(text: 'Agenda'),
+        title: Row(
+          children: [
+            const Text('Axes', style: TextStyle(fontWeight: FontWeight.bold)),
           ],
         ),
         actions: [
+          DropdownButtonHideUnderline(
+            child: DropdownButton<CalendarView>(
+              value: _currentView,
+              icon: const Icon(Icons.arrow_drop_down, color: Colors.black54),
+              style: const TextStyle(
+                color: Colors.black87,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+              onChanged: (CalendarView? newValue) {
+                if (newValue != null) {
+                  setState(() {
+                    _currentView = newValue;
+                  });
+                }
+              },
+              items: CalendarView.values.map((CalendarView view) {
+                return DropdownMenuItem<CalendarView>(
+                  value: view,
+                  child: Text(
+                    view.name[0].toUpperCase() + view.name.substring(1),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          const SizedBox(width: 24),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
@@ -59,17 +70,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       body: Row(
         children: [
           const CalendarSidebar(),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: const [
-                MonthView(),
-                WeekView(),
-                DayView(),
-                AgendaView(),
-              ],
-            ),
-          ),
+          Expanded(child: _buildCurrentView()),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -82,5 +83,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         child: const Icon(Icons.add),
       ),
     );
+  }
+
+  Widget _buildCurrentView() {
+    switch (_currentView) {
+      case CalendarView.month:
+        return const MonthView();
+      case CalendarView.week:
+        return const WeekView();
+      case CalendarView.day:
+        return const DayView();
+      case CalendarView.agenda:
+        return const AgendaView();
+    }
   }
 }
