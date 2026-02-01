@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../application/event/event_notifier.dart';
 import '../../application/calendar/calendar_notifier.dart';
 import '../../domain/entities/event.dart';
+import '../../domain/entities/calendar.dart';
 import '../widgets/event_editor_dialog.dart';
 
 class AgendaView extends ConsumerStatefulWidget {
@@ -17,6 +18,10 @@ class _AgendaViewState extends ConsumerState<AgendaView> {
   @override
   void initState() {
     super.initState();
+    _loadAgenda();
+  }
+
+  void _loadAgenda() {
     // Load events for next 30 days
     final from = DateTime.now();
     final to = from.add(const Duration(days: 30));
@@ -30,9 +35,7 @@ class _AgendaViewState extends ConsumerState<AgendaView> {
     final calendarsAsync = ref.watch(calendarListProvider);
 
     ref.listen(selectedCalendarIdsProvider, (previous, next) {
-      final from = DateTime.now();
-      final to = from.add(const Duration(days: 30));
-      ref.read(eventListProvider.notifier).loadEvents(from: from, to: to);
+      _loadAgenda();
     });
 
     return eventsAsync.when(
@@ -55,7 +58,7 @@ class _AgendaViewState extends ConsumerState<AgendaView> {
   Widget _buildAgendaList(
     List<Event> events,
     Set<String> selectedIds,
-    List<dynamic> calendars,
+    List<Calendar> calendars,
   ) {
     if (events.isEmpty) {
       return const Center(child: Text('No upcoming events'));
