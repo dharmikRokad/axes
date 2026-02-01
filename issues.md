@@ -1,3 +1,9 @@
-- event cards in week/day view should show the same color of it's calender
-- week / agenda view shows continuous loader
-- coming back to month view after visiting week/agenda view shows loader
+- UI Refinements
+1. Month View
+2. Remove tabs and add drop down at top left to switch views
+
+
+
+- Features
+1. sharing calender
+2. Notifications

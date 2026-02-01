@@ -21,7 +21,7 @@ class CalendarRepository {
   Future<void> updateCalendar(String id, Map<String, dynamic> updates) async {
     await _calendars.update(
       where.id(ObjectId.fromHexString(id)),
-      {'\$set': updates},
+      {r'$set': updates},
     );
   }
 

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -7,7 +8,7 @@ import '../../domain/repositories/auth_repository.dart';
 class AuthRepositoryImpl implements AuthRepository {
   final Dio _dio;
   final FlutterSecureStorage _storage;
-    
+
   AuthRepositoryImpl(this._dio, this._storage);
 
   @override
@@ -22,6 +23,7 @@ class AuthRepositoryImpl implements AuthRepository {
       final user = User.fromJson(data['user']);
       await _storage.write(key: 'accessToken', value: data['accessToken']);
       await _storage.write(key: 'refreshToken', value: data['refreshToken']);
+      await _storage.write(key: 'user', value: jsonEncode(user.toJson()));
 
       return right(user);
     } on DioException catch (e) {
@@ -48,6 +50,7 @@ class AuthRepositoryImpl implements AuthRepository {
       final user = User.fromJson(data['user']);
       await _storage.write(key: 'accessToken', value: data['accessToken']);
       await _storage.write(key: 'refreshToken', value: data['refreshToken']);
+      await _storage.write(key: 'user', value: jsonEncode(user.toJson()));
 
       return right(user);
     } on DioException catch (e) {
@@ -64,15 +67,22 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> logout() async {
     await _storage.delete(key: 'accessToken');
     await _storage.delete(key: 'refreshToken');
+    await _storage.delete(key: 'user');
   }
 
   @override
   Future<Option<User>> getCurrentUser() async {
-    // TODO: Implement /auth/me or verify token and decode
-    // For now, simpler implementation:
-    // If token exists, we might need to fetch profile.
-    // Let's assume we store user info locally or fetch it.
-    // For this MVP step, we will return none() if not fully implemented.
+    final userJson = await _storage.read(key: 'user');
+    final accessToken = await _storage.read(key: 'accessToken');
+
+    if (userJson != null && accessToken != null) {
+      try {
+        final user = User.fromJson(jsonDecode(userJson));
+        return some(user);
+      } catch (_) {
+        return none();
+      }
+    }
     return none();
   }
 }
