@@ -5,6 +5,7 @@ import '../../application/event/event_notifier.dart';
 import '../../domain/entities/event.dart';
 import '../widgets/event_editor_dialog.dart';
 import '../../application/calendar/calendar_notifier.dart';
+import '../../domain/entities/calendar.dart';
 
 class WeekView extends ConsumerStatefulWidget {
   const WeekView({super.key});
@@ -51,6 +52,7 @@ class _WeekViewState extends ConsumerState<WeekView> {
   Widget build(BuildContext context) {
     final eventsAsync = ref.watch(eventListProvider);
     final selectedIds = ref.watch(selectedCalendarIdsProvider);
+    final calendarsAsync = ref.watch(calendarListProvider);
 
     ref.listen(selectedCalendarIdsProvider, (previous, next) {
       _loadEventsForWeek();
@@ -61,8 +63,18 @@ class _WeekViewState extends ConsumerState<WeekView> {
         _buildWeekHeader(),
         Expanded(
           child: eventsAsync.when(
-            data: (events) => _buildTimeGrid(events, selectedIds),
-            loading: () => const Center(child: CircularProgressIndicator()),
+            data: (events) =>
+                _buildTimeGrid(events, selectedIds, calendarsAsync.value ?? []),
+            loading: () {
+              if (eventsAsync.hasValue) {
+                return _buildTimeGrid(
+                  eventsAsync.value!,
+                  selectedIds,
+                  calendarsAsync.value ?? [],
+                );
+              }
+              return const Center(child: CircularProgressIndicator());
+            },
             error: (err, stack) => Center(child: Text('Error: $err')),
           ),
         ),
@@ -108,7 +120,11 @@ class _WeekViewState extends ConsumerState<WeekView> {
     );
   }
 
-  Widget _buildTimeGrid(List<Event> events, Set<String> selectedIds) {
+  Widget _buildTimeGrid(
+    List<Event> events,
+    Set<String> selectedIds,
+    List<Calendar> calendars,
+  ) {
     return SingleChildScrollView(
       controller: _scrollController,
       child: Row(
@@ -127,7 +143,9 @@ class _WeekViewState extends ConsumerState<WeekView> {
                       e.startDateTime.day == day.day &&
                       selectedIds.contains(e.calendarId);
                 }).toList();
-                return Expanded(child: _buildDayColumn(day, dayEvents));
+                return Expanded(
+                  child: _buildDayColumn(day, dayEvents, calendars),
+                );
               }),
             ),
           ),
@@ -153,7 +171,11 @@ class _WeekViewState extends ConsumerState<WeekView> {
     );
   }
 
-  Widget _buildDayColumn(DateTime day, List<Event> events) {
+  Widget _buildDayColumn(
+    DateTime day,
+    List<Event> events,
+    List<Calendar> calendars,
+  ) {
     final isToday =
         DateTime.now().year == day.year &&
         DateTime.now().month == day.month &&
@@ -196,17 +218,23 @@ class _WeekViewState extends ConsumerState<WeekView> {
             ),
           ),
           // Events
-          ...events.map((event) => _buildEventBlock(event)),
+          ...events.map((event) => _buildEventBlock(event, calendars)),
         ],
       ),
     );
   }
 
-  Widget _buildEventBlock(Event event) {
+  Widget _buildEventBlock(Event event, List<Calendar> calendars) {
     final startHour =
         event.startDateTime.hour + event.startDateTime.minute / 60;
     final endHour = event.endDateTime.hour + event.endDateTime.minute / 60;
     final duration = endHour - startHour;
+
+    final calendar = calendars.firstWhere(
+      (c) => c.id == event.calendarId,
+      orElse: () => Calendar(id: '', name: '', color: '#2196F3'),
+    );
+    final color = Color(int.parse(calendar.color.replaceFirst('#', '0xFF')));
 
     return Positioned(
       top: 40 + (startHour * 60), // 40 for header + hour offset
@@ -223,9 +251,9 @@ class _WeekViewState extends ConsumerState<WeekView> {
         child: Container(
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: Colors.blue.shade400,
+            color: color.withOpacity(0.8),
             borderRadius: BorderRadius.circular(4),
-            border: Border.all(color: Colors.blue.shade700),
+            border: Border.all(color: color),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -240,7 +268,7 @@ class _WeekViewState extends ConsumerState<WeekView> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              if (duration > 1)
+              if (duration > 0.5)
                 Text(
                   '${DateFormat('h:mm a').format(event.startDateTime)} - ${DateFormat('h:mm a').format(event.endDateTime)}',
                   style: const TextStyle(color: Colors.white70, fontSize: 10),

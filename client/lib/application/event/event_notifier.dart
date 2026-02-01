@@ -30,15 +30,42 @@ class EventListNotifier extends StateNotifier<AsyncValue<List<Event>>> {
     DateTime? from,
     DateTime? to,
   }) async {
-    if (from != null) _lastFrom = from;
-    if (to != null) _lastTo = to;
-
+    final ids = calendarIds ?? ref.read(selectedCalendarIdsProvider).toList();
     final currentFrom = from ?? _lastFrom;
     final currentTo = to ?? _lastTo;
 
-    state = const AsyncValue.loading();
+    // Basic caching: if parameters haven't changed and we have data, skip loading
+    if (state.hasValue &&
+        _lastFrom == from &&
+        _lastTo == to &&
+        ids.length ==
+            (calendarIds?.length ??
+                ref.read(selectedCalendarIdsProvider).length)) {
+      // This is a very simple check, could be more robust by comparing ID sets
+      bool sameIds = true;
+      final currentIds = ref.read(selectedCalendarIdsProvider);
+      if (calendarIds != null) {
+        if (calendarIds.length != currentIds.length) {
+          sameIds = false;
+        } else {
+          for (final id in calendarIds) {
+            if (!currentIds.contains(id)) {
+              sameIds = false;
+              break;
+            }
+          }
+        }
+      }
 
-    final ids = calendarIds ?? ref.read(selectedCalendarIdsProvider).toList();
+      if (sameIds && from == _lastFrom && to == _lastTo) {
+        return;
+      }
+    }
+
+    if (from != null) _lastFrom = from;
+    if (to != null) _lastTo = to;
+
+    state = AsyncLoading<List<Event>>().copyWithPrevious(state);
 
     if (ids.isEmpty) {
       state = const AsyncValue.data([]);

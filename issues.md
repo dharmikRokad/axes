@@ -1,0 +1,3 @@
+- event cards in week/day view should show the same color of it's calender
+- week / agenda view shows continuous loader
+- coming back to month view after visiting week/agenda view shows loader

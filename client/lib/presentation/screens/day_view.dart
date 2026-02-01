@@ -5,6 +5,7 @@ import '../../application/event/event_notifier.dart';
 import '../../domain/entities/event.dart';
 import '../widgets/event_editor_dialog.dart';
 import '../../application/calendar/calendar_notifier.dart';
+import '../../domain/entities/calendar.dart';
 
 class DayView extends ConsumerStatefulWidget {
   const DayView({super.key});
@@ -49,6 +50,7 @@ class _DayViewState extends ConsumerState<DayView> {
   Widget build(BuildContext context) {
     final eventsAsync = ref.watch(eventListProvider);
     final selectedIds = ref.watch(selectedCalendarIdsProvider);
+    final calendarsAsync = ref.watch(calendarListProvider);
 
     ref.listen(selectedCalendarIdsProvider, (previous, next) {
       _loadEventsForDay();
@@ -66,9 +68,20 @@ class _DayViewState extends ConsumerState<DayView> {
                     e.startDateTime.day == _selectedDay.day &&
                     selectedIds.contains(e.calendarId);
               }).toList();
-              return _buildTimeGrid(todayEvents);
+              return _buildTimeGrid(todayEvents, calendarsAsync.value ?? []);
             },
-            loading: () => const Center(child: CircularProgressIndicator()),
+            loading: () {
+              if (eventsAsync.hasValue) {
+                final todayEvents = eventsAsync.value!.where((e) {
+                  return e.startDateTime.year == _selectedDay.year &&
+                      e.startDateTime.month == _selectedDay.month &&
+                      e.startDateTime.day == _selectedDay.day &&
+                      selectedIds.contains(e.calendarId);
+                }).toList();
+                return _buildTimeGrid(todayEvents, calendarsAsync.value ?? []);
+              }
+              return const Center(child: CircularProgressIndicator());
+            },
             error: (err, stack) => Center(child: Text('Error: $err')),
           ),
         ),
@@ -123,7 +136,7 @@ class _DayViewState extends ConsumerState<DayView> {
     );
   }
 
-  Widget _buildTimeGrid(List<Event> events) {
+  Widget _buildTimeGrid(List<Event> events, List<Calendar> calendars) {
     return SingleChildScrollView(
       controller: _scrollController,
       child: Container(
@@ -179,7 +192,7 @@ class _DayViewState extends ConsumerState<DayView> {
                   // Current time indicator
                   if (_isToday()) _buildCurrentTimeIndicator(),
                   // Events
-                  ...events.map((event) => _buildEventBlock(event)),
+                  ...events.map((event) => _buildEventBlock(event, calendars)),
                 ],
               ),
             ),
@@ -221,7 +234,7 @@ class _DayViewState extends ConsumerState<DayView> {
     );
   }
 
-  Widget _buildEventBlock(Event event) {
+  Widget _buildEventBlock(Event event, List<Calendar> calendars) {
     final startMinutes =
         event.startDateTime.hour * 60 + event.startDateTime.minute;
     final endMinutes = event.endDateTime.hour * 60 + event.endDateTime.minute;
@@ -229,6 +242,12 @@ class _DayViewState extends ConsumerState<DayView> {
 
     final topOffset = (startMinutes / 60) * 80;
     final height = (durationMinutes / 60) * 80;
+
+    final calendar = calendars.firstWhere(
+      (c) => c.id == event.calendarId,
+      orElse: () => Calendar(id: '', name: '', color: '#2196F3'),
+    );
+    final color = Color(int.parse(calendar.color.replaceFirst('#', '0xFF')));
 
     return Positioned(
       top: topOffset,
@@ -245,9 +264,9 @@ class _DayViewState extends ConsumerState<DayView> {
         child: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.blue.shade400,
+            color: color.withOpacity(0.8),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.blue.shade700, width: 2),
+            border: Border.all(color: color, width: 2),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.1),
