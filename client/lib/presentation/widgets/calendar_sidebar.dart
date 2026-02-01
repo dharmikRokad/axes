@@ -82,21 +82,10 @@ class CalendarSidebar extends ConsumerWidget {
                       ref.read(selectedCalendarIdsProvider.notifier).state =
                           newSelected;
                     },
-                    trailing: PopupMenuButton<String>(
-                      onSelected: (value) {
-                        if (value == 'edit') {
-                          _showEditCalendarDialog(context, ref, calendar);
-                        } else if (value == 'delete') {
-                          _showDeleteConfirmation(context, ref, calendar);
-                        }
-                      },
-                      itemBuilder: (context) => [
-                        const PopupMenuItem(value: 'edit', child: Text('Edit')),
-                        const PopupMenuItem(
-                          value: 'delete',
-                          child: Text('Delete'),
-                        ),
-                      ],
+                    trailing: IconButton(
+                      icon: const Icon(Icons.more_vert),
+                      onPressed: () =>
+                          _showEditCalendarDialog(context, ref, calendar),
                     ),
                   );
                 },
@@ -282,38 +271,6 @@ class CalendarSidebar extends ConsumerWidget {
             ],
           );
         },
-      ),
-    );
-  }
-
-  void _showDeleteConfirmation(
-    BuildContext context,
-    WidgetRef ref,
-    Calendar calendar,
-  ) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Calendar'),
-        content: Text(
-          'Are you sure you want to delete "${calendar.name}"? This will also delete all events in this calendar.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            onPressed: () {
-              ref
-                  .read(calendarListProvider.notifier)
-                  .deleteCalendar(calendar.id);
-              Navigator.pop(context);
-            },
-            child: const Text('Delete'),
-          ),
-        ],
       ),
     );
   }
