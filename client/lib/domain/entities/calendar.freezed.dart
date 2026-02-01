@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Calendar {
 
- String get id; String get name; String get color; String? get ownerId; DateTime? get createdAt;
+@JsonKey(name: '_id') String get id; String get name; String get color; String? get ownerId; DateTime? get createdAt;
 /// Create a copy of Calendar
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $CalendarCopyWith<$Res>  {
   factory $CalendarCopyWith(Calendar value, $Res Function(Calendar) _then) = _$CalendarCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String color, String? ownerId, DateTime? createdAt
+@JsonKey(name: '_id') String id, String name, String color, String? ownerId, DateTime? createdAt
 });
 
 
@@ -157,7 +157,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String color,  String? ownerId,  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String name,  String color,  String? ownerId,  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Calendar() when $default != null:
 return $default(_that.id,_that.name,_that.color,_that.ownerId,_that.createdAt);case _:
@@ -178,7 +178,7 @@ return $default(_that.id,_that.name,_that.color,_that.ownerId,_that.createdAt);c
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String color,  String? ownerId,  DateTime? createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String name,  String color,  String? ownerId,  DateTime? createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _Calendar():
 return $default(_that.id,_that.name,_that.color,_that.ownerId,_that.createdAt);case _:
@@ -198,7 +198,7 @@ return $default(_that.id,_that.name,_that.color,_that.ownerId,_that.createdAt);c
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String color,  String? ownerId,  DateTime? createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: '_id')  String id,  String name,  String color,  String? ownerId,  DateTime? createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _Calendar() when $default != null:
 return $default(_that.id,_that.name,_that.color,_that.ownerId,_that.createdAt);case _:
@@ -213,10 +213,10 @@ return $default(_that.id,_that.name,_that.color,_that.ownerId,_that.createdAt);c
 @JsonSerializable()
 
 class _Calendar implements Calendar {
-  const _Calendar({required this.id, required this.name, required this.color, this.ownerId, this.createdAt});
+  const _Calendar({@JsonKey(name: '_id') required this.id, required this.name, required this.color, this.ownerId, this.createdAt});
   factory _Calendar.fromJson(Map<String, dynamic> json) => _$CalendarFromJson(json);
 
-@override final  String id;
+@override@JsonKey(name: '_id') final  String id;
 @override final  String name;
 @override final  String color;
 @override final  String? ownerId;
@@ -255,7 +255,7 @@ abstract mixin class _$CalendarCopyWith<$Res> implements $CalendarCopyWith<$Res>
   factory _$CalendarCopyWith(_Calendar value, $Res Function(_Calendar) _then) = __$CalendarCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String color, String? ownerId, DateTime? createdAt
+@JsonKey(name: '_id') String id, String name, String color, String? ownerId, DateTime? createdAt
 });
 
 

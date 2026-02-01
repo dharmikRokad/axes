@@ -90,10 +90,14 @@ class _DayViewState extends ConsumerState<DayView> {
   }
 
   Widget _buildDayHeader() {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
+        color: colorScheme.surface,
+        border: Border(
+          bottom: BorderSide(color: colorScheme.outline.withOpacity(0.5)),
+        ),
       ),
       child: Row(
         children: [
@@ -110,7 +114,11 @@ class _DayViewState extends ConsumerState<DayView> {
             child: Text(
               DateFormat('EEEE, MMMM d, yyyy').format(_selectedDay),
               textAlign: TextAlign.center,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                color: colorScheme.onSurface,
+              ),
             ),
           ),
           IconButton(
@@ -122,14 +130,15 @@ class _DayViewState extends ConsumerState<DayView> {
               });
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.today),
+          const SizedBox(width: 8),
+          FilledButton.tonal(
             onPressed: () {
               setState(() {
                 _selectedDay = DateTime.now();
                 _loadEventsForDay();
               });
             },
+            child: const Text('Today'),
           ),
         ],
       ),
@@ -158,8 +167,8 @@ class _DayViewState extends ConsumerState<DayView> {
                         child: Text(
                           DateFormat('h a').format(DateTime(2020, 1, 1, hour)),
                           style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey.shade600,
+                            fontSize: 12,
+                            color: colorScheme.onSurface.withOpacity(0.5),
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -181,7 +190,7 @@ class _DayViewState extends ConsumerState<DayView> {
                         decoration: BoxDecoration(
                           border: Border(
                             top: BorderSide(
-                              color: Colors.grey.shade300,
+                              color: colorScheme.outline.withOpacity(0.3),
                               width: hour == 0 ? 2 : 1,
                             ),
                           ),
@@ -210,9 +219,10 @@ class _DayViewState extends ConsumerState<DayView> {
   }
 
   Widget _buildCurrentTimeIndicator() {
+    final colorScheme = Theme.of(context).colorScheme;
     final now = DateTime.now();
     final minutesSinceMidnight = now.hour * 60 + now.minute;
-    final topOffset = (minutesSinceMidnight / 60) * 80; // 80px per hour
+    final topOffset = (minutesSinceMidnight / 60) * 80;
 
     return Positioned(
       top: topOffset,
@@ -223,12 +233,12 @@ class _DayViewState extends ConsumerState<DayView> {
           Container(
             width: 8,
             height: 8,
-            decoration: const BoxDecoration(
-              color: Colors.red,
+            decoration: BoxDecoration(
+              color: colorScheme.primary,
               shape: BoxShape.circle,
             ),
           ),
-          Expanded(child: Container(height: 2, color: Colors.red)),
+          Expanded(child: Container(height: 2, color: colorScheme.primary)),
         ],
       ),
     );

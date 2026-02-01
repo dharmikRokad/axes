@@ -1,7 +1,7 @@
-- UI Refinements
-1. Month View
-2. Remove tabs and add drop down at top left to switch views
+- Next 
 
+1. implement Theme
+2. UI according stich (side bar, auth, month, create/edit dialog)
 
 
 - Features
